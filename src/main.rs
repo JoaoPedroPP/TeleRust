@@ -3,6 +3,8 @@ use log::info;
 use futures::StreamExt;
 use telegram_bot::*;
 
+mod bot;
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     // load env values
@@ -12,6 +14,8 @@ async fn main() -> Result<(), Error> {
     env_logger::builder()
         .format_timestamp(None)
         .init();
+
+    bot::chat().await;
 
     let token = env::var("TELEGRAM_TOKEN").expect("TELEGRAM_TOKEN not set");
     // let t = chrono::Utc::now();

@@ -35,7 +35,7 @@ struct Session {
 }
 
 // #[tokio::main]
-pub async fn chat() /*-> Result<(), dyn std::error::Error>*/ {
+pub async fn chat() -> Result<serde_json::Value, reqwest::Error> {
     let watson_url = std::env::var("WATSON_URL").expect("No WATSON_URL provided");
     let watson_apikey = std::env::var("WATSON_APIKEY").expect("No WATSON_APIKEY provided");
     let assistant_id = std::env::var("WATSON_ASSISTANT_ID").expect("No WATSON_ASSISTANT_ID provided");
@@ -71,25 +71,44 @@ pub async fn chat() /*-> Result<(), dyn std::error::Error>*/ {
     match resp {
         Ok(response) => {
             let body = response.json::<serde_json::Value>().await.unwrap();
-            let text = match body.get("output") {
+            // Ok(body)
+            match body.get("output") {
                 Some(value) => {
-                    let generic = value.get("generic").unwrap();
-                    let text_resp = generic[0].get("text").unwrap();
-                    println!("{}", text_resp);
-                    "a"
+                    match value.get("generic") {
+                        Some(assistant_resp) => return Ok(serde_json::to_value(assistant_resp).unwrap()),
+                        None => {
+                            let ret = r#"[{
+                                "text": "Não foi possível se conectar ao bot"
+                            }]"#;
+                            return Ok(serde_json::from_str(&ret).unwrap());
+                        }
+                    }
+                    // let text_resp = generic[0].get("text").unwrap();
+                    // println!("{}", text_resp);
+                    // text_resp.to_string()
+                    // return Ok(generic);
                 },
-                None => "Não foi possível estabelcer com o chat"
+                None => {
+                    let ret = r#"[{
+                        "text": "Não foi possível se conectar ao bot"
+                    }]"#;
+                    return Ok(serde_json::from_str(&ret).unwrap());
+                }
             };
-            println!("{:#?}", text);
+            // println!("{:#?}", text);
+            // Ok(text)
         },
         Err(error) => {
-            println!("NO");
+            // println!("NO");
+            let data = r#"[{
+                "text": "Não foi possível se conectar ao bot"
+            }]"#;
+            Ok(serde_json::from_str(&data).unwrap())
         }
-
     }
     // let x = getSession().await;
     // println!("{:#?}", x);
-    // Ok(())
+    // Ok()
 }
 
 // At the moment the chat conversation will be only statless

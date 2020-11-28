@@ -1307,6 +1307,7 @@ dependencies = [
  "log 0.4.11",
  "reqwest",
  "serde",
+ "serde_json",
  "telegram-bot",
  "tokio",
 ]

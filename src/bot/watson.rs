@@ -83,10 +83,6 @@ pub async fn chat() -> Result<serde_json::Value, reqwest::Error> {
                             return Ok(serde_json::from_str(&ret).unwrap());
                         }
                     }
-                    // let text_resp = generic[0].get("text").unwrap();
-                    // println!("{}", text_resp);
-                    // text_resp.to_string()
-                    // return Ok(generic);
                 },
                 None => {
                     let ret = r#"[{
@@ -95,8 +91,6 @@ pub async fn chat() -> Result<serde_json::Value, reqwest::Error> {
                     return Ok(serde_json::from_str(&ret).unwrap());
                 }
             };
-            // println!("{:#?}", text);
-            // Ok(text)
         },
         Err(error) => {
             // println!("NO");

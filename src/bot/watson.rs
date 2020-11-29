@@ -34,8 +34,13 @@ struct Session {
     session_id: String
 }
 
+struct TelegramUser {
+    chat_id: String,
+    session_id: String
+}
+
 // #[tokio::main]
-pub async fn chat() -> Result<serde_json::Value, reqwest::Error> {
+pub async fn chat(input: &str) -> Result<serde_json::Value, reqwest::Error> {
     log::info!("Requesting Watson Watson API");
     let watson_url = std::env::var("WATSON_URL").expect("No WATSON_URL provided");
     let watson_apikey = std::env::var("WATSON_APIKEY").expect("No WATSON_APIKEY provided");
@@ -49,7 +54,7 @@ pub async fn chat() -> Result<serde_json::Value, reqwest::Error> {
     let url = format!("{}/v2/assistants/{}/message?version=2020-04-01", &watson_url, &assistant_id);
 
     let text = Text {
-        text: String::from("Quando a fundação foi fundanda")
+        text: String::from(input)
     };
 
     let payload = Payload {
@@ -70,7 +75,10 @@ pub async fn chat() -> Result<serde_json::Value, reqwest::Error> {
             match body.get("output") {
                 Some(value) => {
                     match value.get("generic") {
-                        Some(assistant_resp) => return Ok(serde_json::to_value(assistant_resp).unwrap()),
+                        Some(assistant_resp) => {
+                            log::info!("API request successful");
+                            return Ok(serde_json::to_value(assistant_resp).unwrap())
+                        },
                         None => {
                             log::warn!("Virtual assistant does not find any answer");
                             let ret = r#"[{
@@ -103,7 +111,7 @@ pub async fn chat() -> Result<serde_json::Value, reqwest::Error> {
 }
 
 // At the moment the chat conversation will be only statless
-async fn getSession() -> Result<String, reqwest::Error> {
+async fn get_session() -> Result<String, reqwest::Error> {
     let watson_url = std::env::var("WATSON_URL").expect("No WATSON_URL provided");
     let watson_apikey = std::env::var("WATSON_APIKEY").expect("No WATSON_APIKEY provided");
     let assistant_id = std::env::var("WATSON_ASSISTANT_ID").expect("No WATSON_ASSISTANT_ID provided");

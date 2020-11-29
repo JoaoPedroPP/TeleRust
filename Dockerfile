@@ -17,4 +17,4 @@ COPY --from=cargo-build /usr/src/app/target/release/telerust .
 ENV RUST_LOG=info
 
 # Run the application
-CMD ["./telerust"]
+CMD ["RUST_LOG=info ./telerust"]

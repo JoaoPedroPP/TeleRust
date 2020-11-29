@@ -25,10 +25,10 @@ async fn main() -> Result<(), Error> {
             let update = update?;
             if let UpdateKind::Message(message) = update.kind {
                 if let MessageKind::Text { ref data, .. } = message.kind {
-                    let t = chrono::Utc::now();
                     log::info!("New Message from -> <{}>: {}", &message.from.first_name, data);
-                    let watson = bot::chat().await.unwrap();
+                    let watson = bot::chat(data).await.unwrap();
                     for resp in watson.as_array().unwrap() {
+                        log::info!("Answering the chat");
                         api.send(
                             message.from.text(
                                 resp["text"].as_str().unwrap()

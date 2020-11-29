@@ -5,6 +5,15 @@ use telegram_bot::*;
 
 mod bot;
 
+struct Model {
+    response_type: String,
+    text: String
+}
+
+// struct BotResponse {
+//     resp: Vec<Model>
+// }
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     // load env values
@@ -29,8 +38,16 @@ async fn main() -> Result<(), Error> {
                     // println!("{} - Message from -> <{}>: {}", &t, &message.from.first_name, data);
                     info!("{} - Message from -> <{}>: {}", &t, &message.from.first_name, data);
                     let watson = bot::chat().await.unwrap();
-                    println!("{:#?}", watson);
-                api.send(message.from.text(format!("Oi {}, Você escreveu: '{}'", &message.from.first_name, data))).await?;
+                    for resp in watson.as_array().unwrap() {
+                        // api.send(message.from.text(format!("Oi {}, Você escreveu: '{}'", &message.from.first_name, data))).await?;
+                        api.send(
+                            message.from.text(
+                                resp["text"].as_str().unwrap()
+                            )
+                        ).await?;
+                        println!("{}", resp);
+                    }
+                    // println!("{:#?}", watson);
             }
         }
     }

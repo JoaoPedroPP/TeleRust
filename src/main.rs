@@ -62,12 +62,12 @@ async fn main() -> Result<(), Error> {
                 if telegram_user.session_id == "" {
                     // primeira iteração do usuario com o bot. Criar sessão.
                     println!("Cria sessão. Primeira sessão");
-                    update_user(&mut users, message.from.id.into(), "new session session").await;
+                    update_user_session(&mut users, message.from.id.into(), "new session session").await;
                 }
                 else if (chrono::Utc::now().timestamp() - telegram_user.last_interaction) > 280 {
                     // Sessão expirou e usuário prcisa de uma nova sessão
                     println!("Cria sessão. Tempo expirado.");
-                    update_user(&mut users, message.from.id.into(), "new session time").await;
+                    update_user_session(&mut users, message.from.id.into(), "new session time").await;
                 }
                 let watson = bot::chat(data).await.unwrap();
                 for resp in watson.as_array().unwrap() {
@@ -78,6 +78,7 @@ async fn main() -> Result<(), Error> {
                         )
                     ).await?;
                 }
+                update_user_last_iterarion(&mut users, message.from.id.into()).await;
             }
         }
     }
@@ -100,11 +101,20 @@ async fn insert_user(users: &mut HashMap<i64, TelegramUser>, id: i64) -> Telegra
     return TelegramUser { session_id: String::from(""), last_interaction: t };
 }
 
-async fn update_user(users: &mut HashMap<i64, TelegramUser>, id: i64, update: &str) {
+async fn update_user_session(users: &mut HashMap<i64, TelegramUser>, id: i64, update_session: &str) {
     for (chat_id, user) in users {
         println!("User: {:?}, chat_id: {}", user, chat_id);
         if id == *chat_id {
-            user.session_id = update.to_string();
+            user.session_id = update_session.to_string();
+        }
+    }
+}
+
+async fn update_user_last_iterarion(users: &mut HashMap<i64, TelegramUser>, id: i64) {
+    for (chat_id, user) in users {
+        println!("User: {:?}, chat_id: {}", user, chat_id);
+        if id == *chat_id {
+            user.last_interaction = chrono::Utc::now().timestamp();
         }
     }
 }

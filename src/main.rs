@@ -62,14 +62,17 @@ async fn main() -> Result<(), Error> {
                 if telegram_user.session_id == "" {
                     // primeira iteração do usuario com o bot. Criar sessão.
                     println!("Cria sessão. Primeira sessão");
-                    update_user_session(&mut users, message.from.id.into(), "new session session").await;
+                    let new_session = bot::create_session().await.unwrap();
+                    update_user_session(&mut users, message.from.id.into(), new_session).await;
                 }
                 else if (chrono::Utc::now().timestamp() - telegram_user.last_interaction) > 280 {
                     // Sessão expirou e usuário prcisa de uma nova sessão
                     println!("Cria sessão. Tempo expirado.");
-                    update_user_session(&mut users, message.from.id.into(), "new session time").await;
+                    let new_session = bot::create_session().await.unwrap();
+                    update_user_session(&mut users, message.from.id.into(), new_session).await;
                 }
                 let watson = bot::chat(data).await.unwrap();
+                // let watson = bot::chat_statefull(data, telegram_user.session_id).await.unwrap();
                 for resp in watson.as_array().unwrap() {
                     log::info!("Answering the chat");
                     api.send(
@@ -101,7 +104,7 @@ async fn insert_user(users: &mut HashMap<i64, TelegramUser>, id: i64) -> Telegra
     return TelegramUser { session_id: String::from(""), last_interaction: t };
 }
 
-async fn update_user_session(users: &mut HashMap<i64, TelegramUser>, id: i64, update_session: &str) {
+async fn update_user_session(users: &mut HashMap<i64, TelegramUser>, id: i64, update_session: String) {
     for (chat_id, user) in users {
         println!("User: {:?}, chat_id: {}", user, chat_id);
         if id == *chat_id {

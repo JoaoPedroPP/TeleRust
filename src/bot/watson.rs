@@ -46,10 +46,6 @@ pub async fn chat(input: &str) -> Result<serde_json::Value, reqwest::Error> {
     let watson_apikey = std::env::var("WATSON_APIKEY").expect("No WATSON_APIKEY provided");
     let assistant_id = std::env::var("WATSON_ASSISTANT_ID").expect("No WATSON_ASSISTANT_ID provided");
 
-    // Stafull chat with Watson
-    // let session = match getSession().await.unwrap(); // This seams to be more complex for session treament
-    // let url = format!("{}/v2/assistants/{}/sessions/{}/message?version=2020-04-01", &watson_url, &assistant_id, &session);
-
     // Stateless chat with Watson
     let url = format!("{}/v2/assistants/{}/message?version=2020-04-01", &watson_url, &assistant_id);
 
@@ -105,9 +101,6 @@ pub async fn chat(input: &str) -> Result<serde_json::Value, reqwest::Error> {
             Ok(serde_json::from_str(&data).unwrap())
         }
     }
-    // let x = getSession().await;
-    // println!("{:#?}", x);
-    // Ok()
 }
 
 pub async fn chat_statefull(input: &str, session_id: String) -> Result<serde_json::Value, reqwest::Error> {
@@ -117,11 +110,7 @@ pub async fn chat_statefull(input: &str, session_id: String) -> Result<serde_jso
     let assistant_id = std::env::var("WATSON_ASSISTANT_ID").expect("No WATSON_ASSISTANT_ID provided");
 
     // Stafull chat with Watson
-    // let session = match getSession().await.unwrap(); // This seams to be more complex for session treament
     let url = format!("{}/v2/assistants/{}/sessions/{}/message?version=2020-04-01", &watson_url, &assistant_id, &session_id);
-
-    // Stateless chat with Watson
-    // let url = format!("{}/v2/assistants/{}/message?version=2020-04-01", &watson_url, &assistant_id);
 
     let text = Text {
         text: String::from(input)
@@ -138,7 +127,6 @@ pub async fn chat_statefull(input: &str, session_id: String) -> Result<serde_jso
         .send()
         .await;
 
-    // println!("{:#?}", resp);
     match resp {
         Ok(response) => {
             let body = response.json::<serde_json::Value>().await.unwrap();
@@ -175,9 +163,6 @@ pub async fn chat_statefull(input: &str, session_id: String) -> Result<serde_jso
             Ok(serde_json::from_str(&data).unwrap())
         }
     }
-    // let x = getSession().await;
-    // println!("{:#?}", x);
-    // Ok()
 }
 
 // At the moment the chat conversation will be only statless
@@ -201,7 +186,6 @@ pub async fn create_session() -> Result<String, reqwest::Error> {
         Err(http_error) => {
             println!("Not possible to make the request: {}", http_error);
             Ok("".to_string())
-            // Err(http_error)
         }
     }
 }

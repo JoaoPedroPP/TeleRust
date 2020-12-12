@@ -6,7 +6,7 @@ The purpouse of this app is to offer a simple way to conect a cloud based bot, l
 
 ## and how do I run it
 
-You just need to compile the code with `cargo build --realease` commando and then execute the binary with `./target/release/telerust`.
+Firts create the `.env` file according to [env.sample](./env.sample) and type your credentials there. Now you just need to compile the code with `cargo build --realease` commando and then execute the binary with `./target/release/telerust`.
 
 At this repo is provided the [Dockerfile](./Dockerfile) in case you want to run with Docker or deploy the app in some sort of container .
 

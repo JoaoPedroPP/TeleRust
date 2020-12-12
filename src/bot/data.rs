@@ -19,7 +19,7 @@ pub enum User {
 
 pub async fn search_user(users: &HashMap<i64, TelegramUser>, id: i64) -> User {
     for (chat_id, user) in users {
-        println!("User: {:?}, chat_id: {}", user, chat_id);
+        // println!("User: {:?}, chat_id: {}", user, chat_id);
         if id == *chat_id {
             return User::Found(user.clone());
         }
@@ -35,7 +35,7 @@ pub async fn insert_user(users: &mut HashMap<i64, TelegramUser>, id: i64) -> Tel
 
 pub async fn update_user_session(users: &mut HashMap<i64, TelegramUser>, id: i64, update_session: String) {
     for (chat_id, user) in users {
-        println!("User: {:?}, chat_id: {}", user, chat_id);
+        // println!("User: {:?}, chat_id: {}", user, chat_id);
         if id == *chat_id {
             user.session_id = update_session.to_string();
         }
@@ -44,7 +44,7 @@ pub async fn update_user_session(users: &mut HashMap<i64, TelegramUser>, id: i64
 
 pub async fn update_user_last_iterarion(users: &mut HashMap<i64, TelegramUser>, id: i64) {
     for (chat_id, user) in users {
-        println!("User: {:?}, chat_id: {}", user, chat_id);
+        // println!("User: {:?}, chat_id: {}", user, chat_id);
         if id == *chat_id {
             user.last_interaction = chrono::Utc::now().timestamp();
         }

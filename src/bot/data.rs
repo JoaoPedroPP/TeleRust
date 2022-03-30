@@ -27,10 +27,10 @@ pub async fn search_user(users: &HashMap<i64, TelegramUser>, id: i64) -> User {
     return User::NoRecord;
 }
 
-pub async fn insert_user(users: &mut HashMap<i64, TelegramUser>, id: i64) -> TelegramUser {
+pub async fn insert_user(users: &mut HashMap<i64, TelegramUser>, id: i64, session: String) -> TelegramUser {
     let t = chrono::Utc::now().timestamp();
-    users.insert(id, TelegramUser::new("", t));
-    return TelegramUser { session_id: String::from(""), last_interaction: t };
+    users.insert(id, TelegramUser::new(session.as_str(), t));
+    return TelegramUser { session_id: session, last_interaction: t };
 }
 
 pub async fn update_user_session(users: &mut HashMap<i64, TelegramUser>, id: i64, update_session: String) {

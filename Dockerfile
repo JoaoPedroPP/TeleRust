@@ -13,7 +13,7 @@ RUN apt-get install ca-certificates libssl-dev -y && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src/app
 
-COPY .env .
+# COPY .env .
 
 COPY --from=cargo-build /usr/src/app/target/release/telerust .
 

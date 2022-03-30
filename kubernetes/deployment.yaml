@@ -1,0 +1,37 @@
+apiVersion:  apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: telegram
+  labels:
+    app: telegram
+spec:
+  selector:
+    matchLabels:
+      app: telegram
+  template:
+    metadata:
+      namespace: default
+      name: telegram
+      labels:
+        app: telegram
+    spec:
+      containers:
+        - name: telegram
+          image: your_image/here
+          envFrom:
+            - configMapRef:
+                name: cm-telegram
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: default
+  name: cm-telegram
+  labels:
+    app: telegram
+data:
+  TELEGRAM_TOKEN: YOUR_TELEGRAM_TOKEN
+  WATSON_URL: YOUR_WATSON_URL
+  WATSON_APIKEY: YOUR_WATSON_APIKEY
+  WATSON_ASSISTANT_ID: YOUR_WATSON_ASSISTANT_ID

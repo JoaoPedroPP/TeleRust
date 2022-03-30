@@ -14,7 +14,7 @@ RUN apk update \
 
 WORKDIR /src/app
 
-COPY .env .
+# COPY .env .
 
 COPY --from=cargo-build /usr/src/app/target/x86_64-unknown-linux-musl/release/telerust .
 

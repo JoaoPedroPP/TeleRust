@@ -78,6 +78,7 @@ pub async fn chat(input: &str) -> Result<serde_json::Value, reqwest::Error> {
                         None => {
                             log::warn!("Virtual assistant does not find any answer");
                             let ret = r#"[{
+                                "response_type": "text",
                                 "text": "Não foi possível se conectar ao bot"
                             }]"#;
                             return Ok(serde_json::from_str(&ret).unwrap());
@@ -87,6 +88,7 @@ pub async fn chat(input: &str) -> Result<serde_json::Value, reqwest::Error> {
                 None => {
                     log::warn!("Virtual assistant does not find any answer");
                     let ret = r#"[{
+                        "response_type": "text",
                         "text": "Não foi possível se conectar ao bot"
                     }]"#;
                     return Ok(serde_json::from_str(&ret).unwrap());
@@ -96,6 +98,7 @@ pub async fn chat(input: &str) -> Result<serde_json::Value, reqwest::Error> {
         Err(error) => {
             log::error!("API request not successfull: {}", error);
             let data = r#"[{
+                "response_type": "text",
                 "text": "Não foi possível se conectar ao bot"
             }]"#;
             Ok(serde_json::from_str(&data).unwrap())
@@ -140,6 +143,7 @@ pub async fn chat_statefull(input: &str, session_id: String) -> Result<serde_jso
                         None => {
                             log::warn!("Virtual assistant does not find any answer");
                             let ret = r#"[{
+                                "response_type": "text",
                                 "text": "Não foi possível se conectar ao bot"
                             }]"#;
                             return Ok(serde_json::from_str(&ret).unwrap());
@@ -149,6 +153,7 @@ pub async fn chat_statefull(input: &str, session_id: String) -> Result<serde_jso
                 None => {
                     log::warn!("Virtual assistant does not find any answer");
                     let ret = r#"[{
+                        "response_type": "text",
                         "text": "Não foi possível se conectar ao bot"
                     }]"#;
                     return Ok(serde_json::from_str(&ret).unwrap());

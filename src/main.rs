@@ -32,38 +32,45 @@ async fn main() -> Result<(), Error> {
                 log::info!("New Message from -> <{}>: {}", &message.from.first_name, data);
                 let telegram_user: bot::TelegramUser = match bot::search_user(&users, message.from.id.into()).await {
                     bot::User::Found(user) => {
-                        // println!("User: {:?}", user);
                         user
                     },
                     bot::User::NoRecord => {
                         log::info!("User {} not found, creating a new record", message.from.id);
-                        bot::insert_user(&mut users, message.from.id.into()).await
+                        log::info!("Creating first session for {}", message.from.id);
+                        let new_session = bot::create_session().await.unwrap();
+                        bot::insert_user(&mut users, message.from.id.into(), new_session).await
                     },
                 };
                 // println!("{}", (chrono::Utc::now().timestamp() - telegram_user.last_interaction));
-                if telegram_user.session_id == "" {
-                    // primeira iteração do usuario com o bot. Criar sessão.
-                    // println!("Cria sessão. Primeira sessão");
-                    log::info!("Creating first session for {}", message.from.id);
-                    let new_session = bot::create_session().await.unwrap();
-                    bot::update_user_session(&mut users, message.from.id.into(), new_session).await;
-                }
-                else if (chrono::Utc::now().timestamp() - telegram_user.last_interaction) > 280 {
+                if (chrono::Utc::now().timestamp() - telegram_user.last_interaction) > 280 {
                     // Sessão expirou e usuário prcisa de uma nova sessão
                     // println!("Cria sessão. Tempo expirado.");
                     log::info!("Session timed out, creating new one for {}", message.from.id);
                     let new_session = bot::create_session().await.unwrap();
                     bot::update_user_session(&mut users, message.from.id.into(), new_session).await;
                 }
-                let watson = bot::chat(data).await.unwrap();
-                // let watson = bot::chat_statefull(data, telegram_user.session_id).await.unwrap();
+                // let watson = bot::chat(data).await.unwrap();
+                let watson = bot::chat_statefull(data, telegram_user.session_id).await.unwrap();
                 for resp in watson.as_array().unwrap() {
                     log::info!("Answering the chat for {}", message.from.id);
-                    api.send(
-                        message.from.text(
-                            resp["text"].as_str().unwrap()
-                        )
-                    ).await?;
+                    if resp["response_type"].as_str().unwrap() == "text" {
+                        api.send(
+                            message.from.text(
+                                resp["text"].as_str().unwrap()
+                            )
+                        ).await?;
+                    } else {
+                        let mut keyboard = ReplyKeyboardMarkup::new();
+                        for i in resp["options"].as_array().unwrap() {
+                            let row = keyboard.add_empty_row();
+                            row.push(KeyboardButton::new(i["label"].as_str().unwrap()));
+                        }
+                        api.send(
+                            message.from.text(
+                                "Escolha uma das opções abaixo"
+                            ).reply_markup(keyboard)
+                        ).await?;
+                    }
                 }
                 bot::update_user_last_iterarion(&mut users, message.from.id.into()).await;
                 log::info!("Last interaction updated for user {}", message.from.id);

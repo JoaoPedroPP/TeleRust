@@ -59,7 +59,12 @@ async fn main() -> Result<(), Error> {
                                 resp["text"].as_str().unwrap()
                             )
                         ).await?;
-                    } else {
+                    } else if resp["response_type"].as_str().unwrap() == "option" {
+                        let title = if resp["title"].as_str() != None {
+                            resp["title"].as_str().unwrap()
+                        } else {
+                            "Escolha uma das opções abaixo"
+                        };
                         let mut keyboard = ReplyKeyboardMarkup::new();
                         for i in resp["options"].as_array().unwrap() {
                             let row = keyboard.add_empty_row();
@@ -67,7 +72,7 @@ async fn main() -> Result<(), Error> {
                         }
                         api.send(
                             message.from.text(
-                                "Escolha uma das opções abaixo"
+                                title
                             ).reply_markup(keyboard)
                         ).await?;
                     }

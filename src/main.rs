@@ -79,16 +79,17 @@ async fn main() -> Result<(), Error> {
                         let source = resp["source"].as_str().unwrap();
                         if resp["title"].as_str() != None {
                             api.send(
-                                message.from.text(
-                                    resp["title"].as_str().unwrap()
+                                message.from.photo(
+                                    InputFileRef::new(source)
+                                ).caption(resp["title"].as_str().unwrap())
+                            ).await?;
+                        } else{
+                            api.send(
+                                message.from.photo(
+                                    InputFileRef::new(source)
                                 )
                             ).await?;
                         }
-                        api.send(
-                            message.from.photo(
-                                InputFileRef::new(source)
-                            )
-                        ).await?;
                     } else {
                         api.send(
                             message.from.text(

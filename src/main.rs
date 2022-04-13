@@ -100,13 +100,13 @@ async fn main() -> Result<(), Error> {
                         }
                         std::thread::sleep_ms(sleep);
                     }
-                    else {
-                        api.send(
-                            message.from.text(
-                                "Else"
-                            )
-                        ).await?;
-                    }
+                    // else {
+                    //     api.send(
+                    //         message.from.text(
+                    //             "Else"
+                    //         )
+                    //     ).await?;
+                    // }
                 }
                 bot::update_user_last_iterarion(&mut users, message.from.id.into()).await;
                 log::info!("Last interaction updated for user {}", message.from.id);

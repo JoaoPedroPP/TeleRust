@@ -90,7 +90,17 @@ async fn main() -> Result<(), Error> {
                                 )
                             ).await?;
                         }
-                    } else {
+                    } else if resp["response_type"].as_str().unwrap() == "pause" {
+                        let sleep = resp["time"].as_u64().unwrap() as u32;
+                        if resp["typing"].as_bool().unwrap() {
+                            // Responsável por alterar o status para typing
+                            api.send(
+                                requests::SendChatAction::new(message.chat.clone(), ChatAction::Typing)
+                            ).await?;
+                        }
+                        std::thread::sleep_ms(sleep);
+                    }
+                    else {
                         api.send(
                             message.from.text(
                                 "Else"

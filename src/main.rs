@@ -75,6 +75,26 @@ async fn main() -> Result<(), Error> {
                                 title
                             ).reply_markup(keyboard)
                         ).await?;
+                    } else if resp["response_type"].as_str().unwrap() == "image" {
+                        let source = resp["source"].as_str().unwrap();
+                        if resp["title"].as_str() != None {
+                            api.send(
+                                message.from.text(
+                                    resp["title"].as_str().unwrap()
+                                )
+                            ).await?;
+                        }
+                        api.send(
+                            message.from.photo(
+                                InputFileRef::new(source)
+                            )
+                        ).await?;
+                    } else {
+                        api.send(
+                            message.from.text(
+                                "Else"
+                            )
+                        ).await?;
                     }
                 }
                 bot::update_user_last_iterarion(&mut users, message.from.id.into()).await;

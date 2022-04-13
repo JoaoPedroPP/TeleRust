@@ -59,7 +59,12 @@ async fn main() -> Result<(), Error> {
                                 resp["text"].as_str().unwrap()
                             )
                         ).await?;
-                    } else {
+                    } else if resp["response_type"].as_str().unwrap() == "option" {
+                        let title = if resp["title"].as_str() != None {
+                            resp["title"].as_str().unwrap()
+                        } else {
+                            "Escolha uma das opções abaixo"
+                        };
                         let mut keyboard = ReplyKeyboardMarkup::new();
                         for i in resp["options"].as_array().unwrap() {
                             let row = keyboard.add_empty_row();
@@ -67,10 +72,41 @@ async fn main() -> Result<(), Error> {
                         }
                         api.send(
                             message.from.text(
-                                "Escolha uma das opções abaixo"
+                                title
                             ).reply_markup(keyboard)
                         ).await?;
+                    } else if resp["response_type"].as_str().unwrap() == "image" {
+                        let source = resp["source"].as_str().unwrap();
+                        if resp["title"].as_str() != None {
+                            api.send(
+                                message.from.photo(
+                                    InputFileRef::new(source)
+                                ).caption(resp["title"].as_str().unwrap())
+                            ).await?;
+                        } else{
+                            api.send(
+                                message.from.photo(
+                                    InputFileRef::new(source)
+                                )
+                            ).await?;
+                        }
+                    } else if resp["response_type"].as_str().unwrap() == "pause" {
+                        let sleep = resp["time"].as_u64().unwrap() as u32;
+                        if resp["typing"].as_bool().unwrap() {
+                            // Responsável por alterar o status para typing
+                            api.send(
+                                requests::SendChatAction::new(message.chat.clone(), ChatAction::Typing)
+                            ).await?;
+                        }
+                        std::thread::sleep_ms(sleep);
                     }
+                    // else {
+                    //     api.send(
+                    //         message.from.text(
+                    //             "Else"
+                    //         )
+                    //     ).await?;
+                    // }
                 }
                 bot::update_user_last_iterarion(&mut users, message.from.id.into()).await;
                 log::info!("Last interaction updated for user {}", message.from.id);

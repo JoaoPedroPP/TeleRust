@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 log = "0.4.11"
 dotenv = "0.15.0"
-telegram-bot = "0.8.0"
+telegram-bot = { git = "https://github.com/ayrat555/telegram-bot", branch = "ayrat555/api-fixes-10" }
 env_logger = "0.8.2"
 chrono = { version="0.4.19", features=["serde"] }
 futures = "0.3"
